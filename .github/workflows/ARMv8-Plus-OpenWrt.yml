@@ -24,7 +24,10 @@ jobs:
     runs-on: ubuntu-22.04
 
     outputs:
-      VERSION_INFO: ${{ steps.clone.outputs.VERSION_INFO }}
+      author: ${{ steps.clone.outputs.author }}
+      date: ${{ steps.clone.outputs.date }}
+      commit: ${{ steps.clone.outputs.commit }}
+      hash: ${{ steps.clone.outputs.hash }}
 
     steps:
     - name: Check Server Performance
@@ -72,9 +75,19 @@ jobs:
         git clone $REPO_URL -b $REPO_BRANCH openwrt
         cd openwrt
         echo "OPENWRT_PATH=$PWD" >> $GITHUB_ENV
-        VERSION_INFO=$(git show -s --date=short --format="作者: %an<br/>时间: %cd<br/>内容: %s<br/>hash: %H")
-        echo "VERSION_INFO=$VERSION_INFO" >> $GITHUB_ENV
-        echo "VERSION_INFO=$VERSION_INFO" >> $GITHUB_OUTPUT
+        author=$(git show -s --date=short --format="作者: %an")
+        date=$(git show -s --date=short --format="时间: %ci")
+        commit=$(git show -s --date=short --format="内容: %s")
+        hash=$(git show -s --date=short --format="hash: %H")
+        echo "author=$author" >> $GITHUB_ENV
+        echo "author=$author" >> $GITHUB_OUTPUT
+        echo "date=$date" >> $GITHUB_ENV
+        echo "date=$date" >> $GITHUB_OUTPUT
+        echo "commit=$commit" >> $GITHUB_ENV
+        echo "commit=$commit" >> $GITHUB_OUTPUT
+        echo "hash=$hash" >> $GITHUB_ENV
+        echo "hash=$hash" >> $GITHUB_OUTPUT
+
 
     - name: Generate Variables
       run: |
@@ -182,14 +195,20 @@ jobs:
           - 🔑 默认密码: password
           ### 🧊 固件版本
           - 固件编译前最后一次➦[主源码](${{ env.REPO_URL }})更新记录
-          - ${{ env.VERSION_INFO }}
+          - ${{ env.author }}
+          - ${{ env.date }}
+          - ${{ env.commit }}
+          - ${{ env.hash }}
 
   Package:
     needs: [Build]
     runs-on: ubuntu-22.04
 
     env:
-      VERSION_INFO: ${{ needs.Build.outputs.VERSION_INFO }}
+      author: ${{ needs.Build.outputs.author }}
+      date: ${{ needs.Build.outputs.date }}
+      commit: ${{ needs.Build.outputs.commit }}
+      hash: ${{ needs.Build.outputs.hash }}
 
     steps:
     - name: Checkout
@@ -259,4 +278,7 @@ jobs:
           - 常见问题及注意事项请参考恩山F大➦[最新帖](https://www.right.com.cn/forum/thread-4076037-1-1.html)
           ### 🧊 固件版本
           - 固件编译前最后一次➦[主源码](${{ env.REPO_URL }})更新记录
-          - ${{ env.VERSION_INFO }}
+          - ${{ env.author }}
+          - ${{ env.date }}
+          - ${{ env.commit }}
+          - ${{ env.hash }}

@@ -59,8 +59,14 @@ jobs:
         git clone $REPO_URL -b $REPO_BRANCH openwrt
         cd openwrt
         echo "OPENWRT_PATH=$PWD" >> $GITHUB_ENV
-        VERSION_INFO=$(git show -s --date=short --format="作者: %an<br/>时间: %cd<br/>内容: %s<br/>hash: %H")
-        echo "VERSION_INFO=$VERSION_INFO" >> $GITHUB_ENV
+        author=$(git show -s --date=short --format="作者: %an")
+        date=$(git show -s --date=short --format="时间: %ci")
+        commit=$(git show -s --date=short --format="内容: %s")
+        hash=$(git show -s --date=short --format="hash: %H")
+        echo "author=$author" >> $GITHUB_ENV
+        echo "date=$date" >> $GITHUB_ENV
+        echo "commit=$commit" >> $GITHUB_ENV
+        echo "hash=$hash" >> $GITHUB_ENV
 
     - name: Generate Variables
       run: |
@@ -166,4 +172,7 @@ jobs:
           - 🔑 默认密码: password
           ### 🧊 固件版本
           - 固件编译前最后一次➦[主源码](${{ env.REPO_URL }})更新记录
-          - ${{ env.VERSION_INFO }}
+          - ${{ env.author }}
+          - ${{ env.date }}
+          - ${{ env.commit }}
+          - ${{ env.hash }}

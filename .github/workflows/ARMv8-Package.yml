@@ -45,11 +45,17 @@ jobs:
 
     - name: Clone Source Code
       run: |
+        df -hT $GITHUB_WORKSPACE
         git clone $REPO_URL -b $REPO_BRANCH openwrt
         cd openwrt
-        VERSION_INFO=$(git show -s --date=short --format="作者: %an<br/>时间: %cd<br/>内容: %s<br/>hash: %H")
-        echo "VERSION_INFO=$VERSION_INFO" >> $GITHUB_ENV
-        echo "DATE=$(date +"%Y-%m-%d %H:%M:%S")" >> $GITHUB_ENV
+        author=$(git show -s --date=short --format="作者: %an")
+        date=$(git show -s --date=short --format="时间: %ci")
+        commit=$(git show -s --date=short --format="内容: %s")
+        hash=$(git show -s --date=short --format="hash: %H")
+        echo "author=$author" >> $GITHUB_ENV
+        echo "date=$date" >> $GITHUB_ENV
+        echo "commit=$commit" >> $GITHUB_ENV
+        echo "hash=$hash" >> $GITHUB_ENV
 
     - name: Download Armvirt Firmware
       id: download
@@ -59,6 +65,7 @@ jobs:
         FIRMWARE_URL=$(curl -s "https://api.github.com/repos/$GITHUB_REPOSITORY/releases" | grep -o "ROOTFS_${{ matrix.version }}.*rootfs.tar.gz")
         wget -q -P $FIRMWARE_PATH https://github.com/$GITHUB_REPOSITORY/releases/download/$FIRMWARE_URL
         echo "status=success" >> $GITHUB_OUTPUT
+        echo "DATE=$(date +"%Y-%m-%d %H:%M:%S")" >> $GITHUB_ENV
         echo "DATE1=$(date +"%y.%m.%d")" >> $GITHUB_ENV
 
     - name: Package OpenWrt Firmware
@@ -102,4 +109,7 @@ jobs:
           - 常见问题及注意事项请参考恩山F大➦[最新帖](https://www.right.com.cn/forum/thread-4076037-1-1.html)
           ### 🧊 固件版本
           - 固件编译前最后一次➦[主源码](${{ env.REPO_URL }})更新记录
-          - ${{ env.VERSION_INFO }}
+          - ${{ env.author }}
+          - ${{ env.date }}
+          - ${{ env.commit }}
+          - ${{ env.hash }}
